@@ -1,22 +1,26 @@
-import { useDispatch, useSelector } from 'react-redux';
-import type { RootState } from '../app/store';
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "../app/store";
+import { isValidEmail } from "../utils/validators";
+
 import {
   updateName,
   updateEmail,
   updatePhone,
   setStatus,
-} from '../features/candidate/candidateSlice';
-import ResumeUploader from '../components/interviewee/ResumeUploader';
-
+} from "../features/candidate/candidateSlice";
+import ResumeUploader from "../components/interviewee/ResumeUploader";
 
 function IntervieweePage() {
   const dispatch = useDispatch();
   const candidate = useSelector((state: RootState) => state.candidate);
 
+  const isEmailValid = isValidEmail(candidate.email);
+
   const isProfileComplete =
-    candidate.name !== '' &&
-    candidate.email !== '' &&
-    candidate.phone !== '';
+  candidate.name !== '' &&
+  candidate.phone !== '' &&
+  isEmailValid &&
+  candidate.resumeText !== '';
 
   return (
     <div>
@@ -34,6 +38,11 @@ function IntervieweePage() {
         value={candidate.email}
         onChange={(e) => dispatch(updateEmail(e.target.value))}
       />
+
+      {candidate.email !== "" && !isEmailValid && (
+        <p style={{ color: "red" }}>Invalid email format</p>
+      )}
+
       <br />
 
       <input
@@ -45,13 +54,17 @@ function IntervieweePage() {
 
       <button
         disabled={!isProfileComplete}
-        onClick={() => dispatch(setStatus('READY'))}
+        onClick={() => dispatch(setStatus("READY"))}
       >
         Continue to Interview
       </button>
+      {candidate.resumeText === '' && (
+  <p style={{ color: 'orange' }}>Please upload resume to continue</p>
+)}
+
 
       <p>Status: {candidate.status}</p>
-        <ResumeUploader />
+      <ResumeUploader />
     </div>
   );
 }

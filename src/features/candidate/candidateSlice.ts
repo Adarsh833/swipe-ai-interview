@@ -7,6 +7,11 @@ export interface CandidateState {
   email: string;
   phone: string;
   resumeText: string;
+
+  questions: string[];
+  currentQuestionIndex: number;
+  answers: string[];
+
   status: 'NEW' | 'READY' | 'IN_PROGRESS' | 'COMPLETED';
 }
 
@@ -16,6 +21,11 @@ const initialState: CandidateState = {
   email: '',
   phone: '',
   resumeText: '',
+
+  questions: [],
+  currentQuestionIndex: 0,
+  answers: [],
+
   status: 'NEW',
 };
 
@@ -42,6 +52,22 @@ const candidateSlice = createSlice({
     setResumeText(state, action: PayloadAction<string>) {
       state.resumeText = action.payload;
     },
+
+    startInterview(state, action: PayloadAction<string[]>) {
+      state.questions = action.payload;
+      state.status = 'IN_PROGRESS';
+      state.currentQuestionIndex = 0;
+      state.answers = [];
+    },
+
+    submitAnswer(state, action: PayloadAction<string>) {
+      state.answers.push(action.payload);
+      state.currentQuestionIndex += 1;
+
+      if (state.currentQuestionIndex >= state.questions.length) {
+        state.status = 'COMPLETED';
+      }
+    },
   },
 });
 
@@ -51,6 +77,8 @@ export const {
   updatePhone,
   setStatus,
   setResumeText,
+  startInterview,
+  submitAnswer,
 } = candidateSlice.actions;
 
 export default candidateSlice.reducer;

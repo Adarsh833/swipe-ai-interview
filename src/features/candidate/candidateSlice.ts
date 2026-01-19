@@ -8,7 +8,6 @@ export interface CandidateState {
   phone: string;
   resumeText: string;
 
-  
   questions: string[];
   currentQuestionIndex: number;
   answers: string[];

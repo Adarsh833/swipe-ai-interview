@@ -12,6 +12,7 @@ export interface CandidateState {
   currentQuestionIndex: number;
   answers: string[];
 
+  
   status: 'NEW' | 'READY' | 'IN_PROGRESS' | 'COMPLETED';
 }
 

@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../app/store";
 import { isValidEmail } from "../utils/validators";
+import InterviewFlow from "../components/interviewee/InterviewFlow";
 
 import {
   updateName,
@@ -21,6 +22,10 @@ function IntervieweePage() {
   candidate.phone !== '' &&
   isEmailValid &&
   candidate.resumeText !== '';
+
+  if (candidate.status !== "NEW") {
+    return <InterviewFlow />;
+  }
 
   return (
     <div>

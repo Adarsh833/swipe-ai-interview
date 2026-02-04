@@ -18,7 +18,7 @@ function ResumeUploader() {
 
     const text = await extractResumeText(file);
     dispatch(setResumeText(text));
-    dispatch(setStatus('READY'));
+    dispatch(setResumeText(text));
   };
 
   return (

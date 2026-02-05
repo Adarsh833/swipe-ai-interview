@@ -1,10 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
-import { startInterview } from "../../features/candidate/candidateSlice";
+import { startInterview, submitAnswer } from "../../features/candidate/candidateSlice";
 import { demoQuestions } from "../../data/questions";
+import { useState } from "react";
+
 
 function InterviewFlow() {
     const dispatch = useDispatch();
+    const [answer, setAnswer] = useState("");
+
   const candidate = useSelector((state: RootState) => state.candidate);
     // Decide
   if (candidate.status === "READY") {
@@ -23,8 +27,23 @@ return (
   <div>
     <h3>Question {candidate.currentQuestionIndex + 1}</h3>
     <p>{question}</p>
-    <textarea />
-    <button>Submit Answer</button>
+    <textarea
+  placeholder="Type your answer here..."
+  value={answer}
+  onChange={(e) => setAnswer(e.target.value)}
+/>
+
+<button
+  disabled={answer.trim() === ""}
+  onClick={() => {
+    dispatch(submitAnswer(answer.trim()));
+    setAnswer("");
+  }}
+>
+  Submit Answer
+</button>
+
+
   </div>
 );
 

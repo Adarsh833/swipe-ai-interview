@@ -12,7 +12,6 @@ export interface CandidateState {
   currentQuestionIndex: number;
   answers: string[];
 
-  
   status: 'NEW' | 'READY' | 'IN_PROGRESS' | 'COMPLETED';
 }
 
@@ -69,6 +68,19 @@ const candidateSlice = createSlice({
         state.status = 'COMPLETED';
       }
     },
+
+    // ✅ CORRECT PLACE
+    resetInterview(state) {
+      state.id = crypto.randomUUID();
+      state.name = '';
+      state.email = '';
+      state.phone = '';
+      state.resumeText = '';
+      state.questions = [];
+      state.currentQuestionIndex = 0;
+      state.answers = [];
+      state.status = 'NEW';
+    },
   },
 });
 
@@ -80,6 +92,7 @@ export const {
   setResumeText,
   startInterview,
   submitAnswer,
+  resetInterview,
 } = candidateSlice.actions;
 
 export default candidateSlice.reducer;

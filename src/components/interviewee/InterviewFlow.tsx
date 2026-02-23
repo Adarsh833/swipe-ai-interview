@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from "react";
 
 function InterviewFlow() {
   const dispatch = useDispatch();
-  const candidate = useSelector((state: RootState) => state.candidate);
+  const candidate = useSelector((state: RootState) => state.candidate.current);
   const hasAutoSubmittedRef = useRef(false);
 
   const [answer, setAnswer] = useState("");

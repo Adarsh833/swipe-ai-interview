@@ -1,154 +1,71 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import type { RootState } from "../app/store";
-import { isValidEmail } from "../utils/validators";
-import InterviewFlow from "../components/interviewee/InterviewFlow";
-import { useState, useEffect } from "react";
-import {
-  updateName,
-  updateEmail,
-  updatePhone,
-  setStatus,
-  resetInterview,
-} from "../features/candidate/candidateSlice";
-import ResumeUploader from "../components/interviewee/ResumeUploader";
+import { useState } from "react";
 
-function IntervieweePage() {
-  const dispatch = useDispatch();
-  const candidate = useSelector((state: RootState) => state.candidate);
+function InterviewerPage() {
+  const history = useSelector(
+    (state: RootState) => state.candidate.history
+  );
 
-  const [showResumeModal, setShowResumeModal] = useState(false);
+  const [search, setSearch] = useState("");
+  const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null);
 
-  const isEmailValid = isValidEmail(candidate.email);
+  const filteredCandidates = history
+    .filter((candidate) =>
+      candidate.name.toLowerCase().includes(search.toLowerCase())
+    )
+    .sort((a, b) => b.score - a.score); // sort by score descending
 
-  const isProfileComplete =
-    candidate.name !== "" &&
-    candidate.phone !== "" &&
-    isEmailValid &&
-    candidate.resumeText !== "";
+  const selectedCandidate = history.find(
+    (c) => c.id === selectedCandidateId
+  );
 
-  // 🔥 Detect unfinished interview on mount
-  useEffect(() => {
-    if (candidate.status === "IN_PROGRESS") {
-      setShowResumeModal(true);
-    }
-  }, []);
-
-  // 🔴 Global Dev Reset Button (always visible in DEV)
-  const DevResetButton =
-    import.meta.env.DEV ? (
-      <button
-        style={{
-          position: "fixed",
-          bottom: 20,
-          right: 20,
-          backgroundColor: "red",
-          color: "white",
-          padding: "10px 15px",
-          border: "none",
-          borderRadius: "8px",
-          cursor: "pointer",
-          zIndex: 9999,
-        }}
-        onClick={() => {
-          localStorage.removeItem("persist:root");
-          dispatch(resetInterview());
-          window.location.reload();
-        }}
-      >
-        Dev Reset
-      </button>
-    ) : null;
-
-  // 1️⃣ Welcome Back Modal (Highest Priority)
-  if (showResumeModal) {
-    return (
-      <>
-        <div style={{ padding: 20, border: "1px solid gray" }}>
-          <h3>Welcome Back</h3>
-          <p>You have an unfinished interview.</p>
-
-          <button onClick={() => setShowResumeModal(false)}>
-            Resume Interview
-          </button>
-
-          <button
-            onClick={() => {
-              dispatch(resetInterview());
-              setShowResumeModal(false);
-            }}
-          >
-            Restart Interview
-          </button>
-        </div>
-
-        {DevResetButton}
-      </>
-    );
-  }
-
-  // 2️⃣ If interview started, show InterviewFlow
-  if (candidate.status !== "NEW") {
-    return (
-      <>
-        <InterviewFlow />
-        {DevResetButton}
-      </>
-    );
-  }
-
-  // 3️⃣ Default: Profile Form
   return (
-    <>
-      <div>
-        <h2>Candidate Profile</h2>
+    <div style={{ padding: 20 }}>
+      <h2>Interviewer Dashboard</h2>
 
-        <input
-          placeholder="Name"
-          value={candidate.name}
-          onChange={(e) => dispatch(updateName(e.target.value))}
-        />
-        <br />
+      <input
+        placeholder="Search by name"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
 
-        <input
-          placeholder="Email"
-          value={candidate.email}
-          onChange={(e) => dispatch(updateEmail(e.target.value))}
-        />
+      <hr />
 
-        {candidate.email !== "" && !isEmailValid && (
-          <p style={{ color: "red" }}>Invalid email format</p>
-        )}
+      {filteredCandidates.length === 0 && <p>No candidates yet.</p>}
 
-        <br />
-
-        <input
-          placeholder="Phone"
-          value={candidate.phone}
-          onChange={(e) => dispatch(updatePhone(e.target.value))}
-        />
-        <br />
-
-        <button
-          disabled={!isProfileComplete}
-          onClick={() => dispatch(setStatus("READY"))}
+      {filteredCandidates.map((candidate) => (
+        <div
+          key={candidate.id}
+          style={{
+            border: "1px solid gray",
+            padding: 10,
+            marginBottom: 10,
+            cursor: "pointer",
+          }}
+          onClick={() => setSelectedCandidateId(candidate.id)}
         >
-          Continue to Interview
-        </button>
+          <h4>{candidate.name}</h4>
+          <p>Email: {candidate.email}</p>
+          <p>Score: {candidate.score}</p>
+          <p>{candidate.summary}</p>
+        </div>
+      ))}
 
-        {candidate.resumeText === "" && (
-          <p style={{ color: "orange" }}>
-            Please upload resume to continue
-          </p>
-        )}
+      {selectedCandidate && (
+        <div style={{ marginTop: 30 }}>
+          <h3>Detailed View</h3>
 
-        <p>Status: {candidate.status}</p>
-
-        <ResumeUploader />
-      </div>
-
-      {DevResetButton}
-    </>
+          {selectedCandidate.questions.map((question, index) => (
+            <div key={index} style={{ marginBottom: 15 }}>
+              <strong>Q{index + 1}: {question}</strong>
+              <p>Answer: {selectedCandidate.answers[index]}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
-export default IntervieweePage;
+export default InterviewerPage;

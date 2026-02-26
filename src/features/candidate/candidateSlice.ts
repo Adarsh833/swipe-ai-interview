@@ -129,12 +129,6 @@ const candidateSlice = createSlice({
           score,
           summary,
         });
-
-        /* --------- Reset current --------- */
-        state.current = {
-          ...initialCurrent,
-          id: crypto.randomUUID(),
-        };
       }
     },
 

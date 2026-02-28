@@ -41,11 +41,9 @@ const initialCurrent: CurrentCandidate = {
   email: "",
   phone: "",
   resumeText: "",
-
   questions: [],
   currentQuestionIndex: 0,
   answers: [],
-
   status: "NEW",
 };
 
@@ -60,7 +58,6 @@ const candidateSlice = createSlice({
   name: "candidate",
   initialState,
   reducers: {
-    /* Profile updates */
     updateName(state, action: PayloadAction<string>) {
       state.current.name = action.payload;
     },
@@ -84,7 +81,6 @@ const candidateSlice = createSlice({
       state.current.status = action.payload;
     },
 
-    /* Interview Start */
     startInterview(state, action: PayloadAction<string[]>) {
       state.current.questions = action.payload;
       state.current.status = "IN_PROGRESS";
@@ -92,7 +88,6 @@ const candidateSlice = createSlice({
       state.current.answers = [];
     },
 
-    /* Answer Submission */
     submitAnswer(state, action: PayloadAction<string>) {
       state.current.answers.push(action.payload);
       state.current.currentQuestionIndex += 1;
@@ -102,37 +97,28 @@ const candidateSlice = createSlice({
         state.current.questions.length
       ) {
         state.current.status = "COMPLETED";
-
-        /* --------- Generate score --------- */
-        const score = Math.floor(
-          (state.current.answers.length /
-            state.current.questions.length) *
-            100
-        );
-
-        /* --------- Generate summary --------- */
-        const summary =
-          score > 70
-            ? "Strong performance with good understanding."
-            : score > 40
-            ? "Average performance with room for improvement."
-            : "Needs significant improvement.";
-
-        /* --------- Push to history --------- */
-        state.history.push({
-          id: state.current.id,
-          name: state.current.name,
-          email: state.current.email,
-          phone: state.current.phone,
-          questions: state.current.questions,
-          answers: state.current.answers,
-          score,
-          summary,
-        });
       }
     },
 
-    /* Reset Entire Session */
+    addToHistory(
+      state,
+      action: PayloadAction<{
+        score: number;
+        summary: string;
+      }>
+    ) {
+      state.history.push({
+        id: state.current.id,
+        name: state.current.name,
+        email: state.current.email,
+        phone: state.current.phone,
+        questions: state.current.questions,
+        answers: state.current.answers,
+        score: action.payload.score,
+        summary: action.payload.summary,
+      });
+    },
+
     resetInterview(state) {
       state.current = {
         ...initialCurrent,
@@ -150,6 +136,7 @@ export const {
   setStatus,
   startInterview,
   submitAnswer,
+  addToHistory,
   resetInterview,
 } = candidateSlice.actions;
 

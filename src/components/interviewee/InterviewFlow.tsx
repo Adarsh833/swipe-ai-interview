@@ -6,6 +6,9 @@ import {
 } from "../../features/candidate/candidateSlice";
 import { demoQuestions } from "../../data/questions";
 import { useEffect, useRef, useState } from "react";
+import { evaluateInterview } from "../../services/evaluationService";
+import { addToHistory } from "../../features/candidate/candidateSlice";
+
 
 function InterviewFlow() {
   const dispatch = useDispatch();
@@ -21,6 +24,7 @@ function InterviewFlow() {
     if (index < 4) return 60;
     return 120;
   }
+
 
   // ⏳ Timer logic
   useEffect(() => {

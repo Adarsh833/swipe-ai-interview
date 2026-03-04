@@ -10,7 +10,9 @@ import {
   setStatus,
   resetInterview,
 } from "../features/candidate/candidateSlice";
+import { evaluateInterview } from "../services/evaluationService";
 import ResumeUploader from "../components/interviewee/ResumeUploader";
+import { addToHistory } from "../features/candidate/candidateSlice";
 
 function IntervieweePage() {
   const dispatch = useDispatch();
@@ -39,6 +41,18 @@ function IntervieweePage() {
       setShowResumeModal(true);
     }
   }, []);
+
+  useEffect(() => {
+  if (candidate.status !== "COMPLETED") return;
+
+  const result = evaluateInterview(
+    candidate.questions,
+    candidate.answers
+  );
+
+  dispatch(addToHistory(result));
+
+}, [candidate.status, dispatch]);
 
   // 🔴 DEV Reset Button
   const DevResetButton =
